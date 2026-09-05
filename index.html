@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCB Test Monitor - Automated Short-Circuit Testing System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="logo-section">
+                    <h1 class="app-title">MCB Test Monitor</h1>
+                    <span class="app-subtitle">Automated Short-Circuit Testing System</span>
+                </div>
+            </div>
+            
+            <div class="nav-center">
+                <div class="connection-status">
+                    <span class="status-dot connected"></span>
+                    <span class="status-text">Controller Connected</span>
+                </div>
+                <div class="current-test-id">
+                    <span class="label">Test ID:</span>
+                    <span class="value" id="currentTestId">TEST-2026-001</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-profile">
+                    <span class="user-name">Engineer</span>
+                    <button class="icon-btn settings-btn" title="Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m11-8h-6m-6 0H1"></path>
+                            <circle cx="19.07" cy="19.07" r="2"></circle>
+                            <circle cx="5" cy="19" r="2"></circle>
+                            <circle cx="19" cy="5" r="2"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <button class="emergency-stop-btn" id="emergencyStop" title="Emergency Stop">
+                    <span class="stop-icon">⊘</span>
+                    <span class="stop-text">E-STOP</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <!-- Left Sidebar Navigation -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="configure">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Configure Test</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="monitoring">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-label">Live Monitoring</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="history">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Test History</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="reports">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-label">Reports</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="health">
+                        <span class="nav-icon">🏥</span>
+                        <span class="nav-label">System Health</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <span class="nav-icon">⚡</span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content-area">
+                <!-- Safety Disclaimer -->
+                <div class="safety-banner">
+                    <span class="warning-icon">⚠️</span>
+                    <span class="warning-text">
+                        <strong>Prototype Mode:</strong> This demonstration system uses low-energy scaled testing. 
+                        Certified high-current compliance testing requires appropriately rated laboratory equipment, 
+                        protection systems, interlocks, and approved procedures.
+                    </span>
+                </div>
+
+                <!-- Pages Container -->
+                <div class="pages-container">
+                    <!-- Dashboard Page -->
+                    <div class="page active" id="dashboard-page">
+                        <div class="dashboard-grid">
+                            <!-- Test Configuration Panel -->
+                            <section class="panel test-config-panel">
+                                <h2 class="panel-title">Test Configuration</h2>
+                                <div class="config-form">
+                                    <div class="form-group">
+                                        <label for="mcbRating">MCB Rating</label>
+                                        <select id="mcbRating" class="form-control">
+                                            <option value="6A">6A</option>
+                                            <option value="10A" selected>10A</option>
+                                            <option value="16A">16A</option>
+                                            <option value="20A">20A</option>
+                                            <option value="32A">32A</option>
+                                            <option value="40A">40A</option>
+                                            <option value="63A">63A</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="mcbType">MCB Type</label>
+                                        <select id="mcbType" class="form-control">
+                                            <option value="B">Type B (3-5x In)</option>
+                                            <option value="C" selected>Type C (5-10x In)</option>
+                                            <option value="D">Type D (10-20x In)</option>
+                                            <option value="K">Type K (8-12x In)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="testCurrent">Target Test Current (A)</label>
+                                        <input type="number" id="testCurrent" class="form-control" value="100" min="10" max="500">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="testDuration">Test Duration (seconds)</label>
+                                        <input type="number" id="testDuration" class="form-control" value="60" min="10" max="300">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="numOperations">Number of Test Operations</label>
+                                        <input type="number" id="numOperations" class="form-control" value="5" min="1" max="20">
+                                    </div>
+
+                                    <div class="safety-interlock">
+                                        <div class="interlock-item">
+                                            <span class="interlock-label">Door Closed</span>
+                                            <span class="status-badge safe">✓ Safe</span>
+                                        </div>
+                                        <div class="interlock-item">
+                                            <span class="interlock-label">E-Stop Released</span>
+                                            <span class="status-badge safe">✓ Safe</span>
+                                        </div>
+                                        <div class="interlock-item">
+                                            <span class="interlock-label">Sensors Ready</span>
+                                            <span class="status-badge safe">✓ Safe</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="button-group">
+                                        <button class="btn btn-primary" id="startTestBtn">Start Test</button>
+                                        <button class="btn btn-secondary" id="pauseTestBtn" disabled>Pause Test</button>
+                                        <button class="btn btn-warning" id="resetBtn">Reset</button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Live Test Status Section -->
+                            <section class="panel test-status-panel">
+                                <h2 class="panel-title">Live Test Status</h2>
+                                <div class="status-indicator-large">
+                                    <div class="status-circle" id="statusCircle">
+                                        <span class="status-text" id="statusText">Ready</span>
+                                    </div>
+                                </div>
+
+                                <div class="progress-section">
+                                    <div class="progress-label">
+                                        <span>Test Progress</span>
+                                        <span class="progress-value" id="progressValue">0%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progressFill"></div>
+                                    </div>
+                                </div>
+
+                                <div class="test-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Operations Completed</span>
+                                        <span class="stat-value" id="operationsCompleted">0 / 5</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Latest Event</span>
+                                        <span class="stat-value" id="latestEvent">--:-- UTC</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Elapsed Time</span>
+                                        <span class="stat-value" id="elapsedTime">00:00</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Real-time Measurement Cards -->
+                            <section class="panel measurements-panel">
+                                <h2 class="panel-title">Real-time Measurements</h2>
+                                <div class="measurements-grid">
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Peak Current</span>
+                                        <span class="measurement-value" id="peakCurrent">-- A</span>
+                                        <span class="measurement-unit">Peak</span>
+                                    </div>
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Fault Current</span>
+                                        <span class="measurement-value" id="faultCurrent">-- kA</span>
+                                        <span class="measurement-unit">Actual</span>
+                                    </div>
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Voltage Before</span>
+                                        <span class="measurement-value" id="voltageBefore">-- V</span>
+                                        <span class="measurement-unit">Pre-Fault</span>
+                                    </div>
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Voltage During</span>
+                                        <span class="measurement-value" id="voltageDuring">-- V</span>
+                                        <span class="measurement-unit">During Fault</span>
+                                    </div>
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Trip Time</span>
+                                        <span class="measurement-value" id="tripTime">-- ms</span>
+                                        <span class="measurement-unit">Response</span>
+                                    </div>
+                                    <div class="measurement-card">
+                                        <span class="measurement-label">Fault Duration</span>
+                                        <span class="measurement-value" id="faultDuration">-- ms</span>
+                                        <span class="measurement-unit">Cleared</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Waveform Visualization -->
+                            <section class="panel waveform-panel">
+                                <h2 class="panel-title">Waveform Analysis</h2>
+                                <div class="waveform-container">
+                                    <canvas id="waveformChart" width="800" height="300"></canvas>
+                                    <div class="waveform-legend">
+                                        <div class="legend-item">
+                                            <span class="legend-color current"></span>
+                                            <span class="legend-label">Current (A)</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color voltage"></span>
+                                            <span class="legend-label">Voltage (V)</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color event"></span>
+                                            <span class="legend-label">MCB Trip Event</span>
+                                        </div>
+                                    </div>
+                                    <div class="waveform-controls">
+                                        <button class="btn-small" id="zoomIn">Zoom In</button>
+                                        <button class="btn-small" id="zoomOut">Zoom Out</button>
+                                        <button class="btn-small" id="resetZoom">Reset View</button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Safety Monitoring Panel -->
+                            <section class="panel safety-panel">
+                                <h2 class="panel-title">Safety Monitoring</h2>
+                                <div class="safety-items">
+                                    <div class="safety-item">
+                                        <span class="safety-label">Enclosure Door</span>
+                                        <span class="safety-status safe">✓ Closed</span>
+                                    </div>
+                                    <div class="safety-item">
+                                        <span class="safety-label">Emergency Stop</span>
+                                        <span class="safety-status safe">✓ Released</span>
+                                    </div>
+                                    <div class="safety-item">
+                                        <span class="safety-label">Sensor Health</span>
+                                        <span class="safety-status safe">✓ All Good</span>
+                                    </div>
+                                    <div class="safety-item">
+                                        <span class="safety-label">Controller Health</span>
+                                        <span class="safety-status safe">✓ Operational</span>
+                                    </div>
+                                    <div class="safety-item">
+                                        <span class="safety-label">Overcurrent Protection</span>
+                                        <span class="safety-status safe">✓ Active</span>
+                                    </div>
+                                    <div class="safety-item">
+                                        <span class="safety-label">Safety Interlock</span>
+                                        <span class="safety-status safe">✓ Engaged</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Test Result Panel -->
+                            <section class="panel result-panel">
+                                <h2 class="panel-title">Test Result</h2>
+                                <div class="result-status" id="resultStatus">
+                                    <span class="result-badge ready">READY</span>
+                                </div>
+
+                                <div class="result-details">
+                                    <div class="result-item">
+                                        <span class="result-label">MCB Operation</span>
+                                        <span class="result-value" id="mcbOperation">-- Not Tested</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Trip Time Result</span>
+                                        <span class="result-value" id="tripTimeResult">-- Not Tested</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Interruption Result</span>
+                                        <span class="result-value" id="interruptionResult">-- Not Tested</span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-section">
+                                    <label for="operatorComments">Operator Comments</label>
+                                    <textarea id="operatorComments" class="form-control" placeholder="Add observations or notes..." rows="3"></textarea>
+                                </div>
+
+                                <div class="button-group">
+                                    <button class="btn btn-primary" id="generatePdfBtn" disabled>Generate PDF Report</button>
+                                    <button class="btn btn-secondary" id="exportCsvBtn" disabled>Export Raw Data (CSV)</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <!-- Configure Test Page -->
+                    <div class="page" id="configure-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">Test Configuration</h2>
+                            <p class="coming-soon">Detailed configuration interface - Coming Soon</p>
+                        </section>
+                    </div>
+
+                    <!-- Live Monitoring Page -->
+                    <div class="page" id="monitoring-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">Live Monitoring</h2>
+                            <p class="coming-soon">Extended monitoring interface - Coming Soon</p>
+                        </section>
+                    </div>
+
+                    <!-- Test History Page -->
+                    <div class="page" id="history-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">Test History</h2>
+                            <div class="search-controls">
+                                <input type="text" class="form-control search-input" placeholder="Search test ID or MCB rating...">
+                                <select class="form-control filter-select">
+                                    <option value="">All Results</option>
+                                    <option value="pass">PASS</option>
+                                    <option value="fail">FAIL</option>
+                                    <option value="review">REVIEW</option>
+                                </select>
+                                <button class="btn btn-secondary" id="exportHistoryBtn">Export History</button>
+                            </div>
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Test ID</th>
+                                        <th>Date</th>
+                                        <th>MCB Rating</th>
+                                        <th>Peak Current</th>
+                                        <th>Trip Time</th>
+                                        <th>Result</th>
+                                        <th>Operator</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                    <tr>
+                                        <td>TEST-2026-001</td>
+                                        <td>2026-01-15 14:32</td>
+                                        <td>10A Type C</td>
+                                        <td>95.5 A</td>
+                                        <td>32 ms</td>
+                                        <td><span class="badge pass">PASS</span></td>
+                                        <td>Engineer A</td>
+                                        <td><button class="btn-small">View</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>TEST-2026-002</td>
+                                        <td>2026-01-15 15:10</td>
+                                        <td>16A Type C</td>
+                                        <td>152.3 A</td>
+                                        <td>28 ms</td>
+                                        <td><span class="badge pass">PASS</span></td>
+                                        <td>Engineer B</td>
+                                        <td><button class="btn-small">View</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+
+                    <!-- Reports Page -->
+                    <div class="page" id="reports-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">Test Reports</h2>
+                            <p class="coming-soon">Report preview and management interface - Coming Soon</p>
+                        </section>
+                    </div>
+
+                    <!-- System Health Page -->
+                    <div class="page" id="health-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">System Health</h2>
+                            <p class="coming-soon">System diagnostics and health monitoring - Coming Soon</p>
+                        </section>
+                    </div>
+
+                    <!-- Settings Page -->
+                    <div class="page" id="settings-page">
+                        <section class="panel full-width">
+                            <h2 class="panel-title">Settings</h2>
+                            <p class="coming-soon">Application settings and configuration - Coming Soon</p>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/waveform.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
